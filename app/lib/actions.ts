@@ -5,6 +5,8 @@ import bcrypt from "bcryptjs";
 import { createToken } from "./jwt";
 import dbConnect from "./db";
 import { User } from "../modals/User";
+import { Agent } from "../modals/Agent";
+import { AgentHistory } from "../modals/AgentHistory";
 
 export const getSession = async () => {
   const cookieStore = await cookies();
@@ -25,7 +27,7 @@ export const logout = async () => {
 };
 
 export const HandleCredentialSignin = async (payload: any) => {
-  const { email, password, firstTime, username } = payload;
+  const { email, password, firstTime } = payload;
   const cookieStore = await cookies();
   try {
     await dbConnect();
@@ -38,7 +40,6 @@ export const HandleCredentialSignin = async (payload: any) => {
 
       const newUser = await User.create({
         email,
-        username,
         password: hash,
       });
 
@@ -139,3 +140,71 @@ export const HandleWalletSignin = async (payload: any) => {
     return { status: "error", message: "Internal server error" };
   }
 };
+
+export const CreateAgentAction = async (payload: any) => {
+  const { agentName, agentInstructions, user, profileImage } = payload;
+  try {
+    await dbConnect();
+
+    const newAgent = new Agent({
+      Agentname: agentName,
+      instructions: agentInstructions,
+      owner: user,
+      profileImage
+    })
+
+    await newAgent.save();
+
+    console.log(newAgent)
+
+    return { status: "success", message: "Agent created successfully" };
+  } catch (error) {
+    console.error(error);
+    return { status: "error", message: "Failed to create agent" };
+  }
+}
+
+export const GetAllAgents = async () => {
+  try {
+    await dbConnect();
+
+    const agents = await Agent.find().lean();
+
+    return { status: "success", message: agents };
+  } catch (error) {
+    console.error(error);
+    return { status: "error", message: "Failed to fetch agents" };
+  }
+}
+
+export const GetAllAgentHistories = async () => { 
+  try {
+    await dbConnect();
+
+    const agentHistories = await AgentHistory.find().lean();
+
+    return { status: "success", message: agentHistories };
+  } catch (error) {
+    console.error(error);
+    return { status: "error", message: "Failed to fetch agent histories" };
+  }
+}
+
+export const CreateChatAgentSession = async (payload: any) => { 
+  const { agent, user } = payload;
+  try {
+    await dbConnect();
+
+    const chatSession = new AgentHistory({
+      owner: user,
+      ParentAgent: agent,
+    })
+
+    await chatSession.save();
+
+    return { status: "success", message: chatSession._id.toString()};
+  } catch (error) {
+    console.error(error);
+    return { status: "error", message: "Failed to create chat session" };
+  }
+}
