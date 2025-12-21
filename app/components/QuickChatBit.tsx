@@ -11,8 +11,12 @@ interface QuickChatBitProps {
   user: any;
 }
 
-const QuickChatBit = ({ recentchats, availableAgents, user }: QuickChatBitProps) => {
-  const router = useRouter()
+const QuickChatBit = ({
+  recentchats,
+  availableAgents,
+  user,
+}: QuickChatBitProps) => {
+  const router = useRouter();
   const sessionAgents = JSON.parse(availableAgents);
   const sessionHistory = JSON.parse(recentchats);
   // --- Carousel Logic ---
@@ -33,14 +37,15 @@ const QuickChatBit = ({ recentchats, availableAgents, user }: QuickChatBitProps)
 
   const agent = sessionAgents[index];
 
-
-  const handleChatCreation = async() => {
+  const handleChatCreation = async () => {
     // TODO : maybe security touch
-    const res =  await CreateChatAgentSession({agent: agent._id,user})
-    if(res.status === 'success'){
-      router.push(`/chat/${res.message}`)
+    const res = await CreateChatAgentSession({ agent: agent._id, user });
+    if (res.status === "success") {
+      router.push(`/chat/${res.message}`);
     }
-  } 
+  };
+
+  // console.log("in chat bit", sessionHistory[0].messages[0].message.slice(0,20))
 
   return (
     <div
@@ -61,7 +66,7 @@ const QuickChatBit = ({ recentchats, availableAgents, user }: QuickChatBitProps)
 
       {/* Recent Chats Grid */}
       <div className="flex items-center justify-between">
-        {sessionHistory.map((chat:any) => (
+        {sessionHistory.map((chat: any) => (
           <div
             key={crypto.randomUUID()}
             className="w-[200px] bg-slate-700/50 p-4 rounded-xl border border-white/10"
@@ -70,7 +75,9 @@ const QuickChatBit = ({ recentchats, availableAgents, user }: QuickChatBitProps)
               <Image src="/file.svg" alt="chat bit" fill />
             </div>
             <h3 className="font-semibold text-slate-100">{chat.title}</h3>
-            <p className="text-slate-300 text-sm mt-1">{chat.messages[0]}</p>
+            <p className="text-slate-300 text-sm mt-1">
+              {chat.messages[chat.messages.length - 1].message.slice(0, 20)}
+            </p>
             <Link href={`/chat/${chat._id}`}>View More</Link>
           </div>
         ))}
@@ -100,7 +107,7 @@ const QuickChatBit = ({ recentchats, availableAgents, user }: QuickChatBitProps)
         }`}
         >
           <div className="relative w-20 h-20 mx-auto mb-4">
-            <Image src={agent.image} alt="agent" fill />
+            <Image src={agent.profileImage} alt="agent" fill />
           </div>
 
           <h2 className="text-xl font-semibold text-purple-200 text-center drop-shadow">

@@ -7,6 +7,10 @@ import dbConnect from "./db";
 import { User } from "../modals/User";
 import { Agent } from "../modals/Agent";
 import { AgentHistory } from "../modals/AgentHistory";
+import { AgentMessage } from "../modals/AgentMessage";
+import { revalidatePath } from "next/cache";
+import fs from "fs/promises";
+import path from "path";
 
 export const getSession = async () => {
   const cookieStore = await cookies();
@@ -146,23 +150,34 @@ export const CreateAgentAction = async (payload: any) => {
   try {
     await dbConnect();
 
+    const [meta, base64Data] = profileImage.split(",");
+    const extension = meta.match(/image\/(.*?);/)?.[1] || "png";
+    const buffer = Buffer.from(base64Data, "base64");
+    const filename = `${Date.now()}-${user}.${extension}`;
+    const filePath = path.join(
+      process.cwd(),
+      "public/agents",
+      filename
+    );
+
+    await fs.writeFile(filePath, buffer);
+
     const newAgent = new Agent({
       Agentname: agentName,
       instructions: agentInstructions,
       owner: user,
-      profileImage
-    })
+      profileImage,
+      profileImageUrl: `/agents/${filename}`
+    });
 
     await newAgent.save();
-
-    console.log(newAgent)
 
     return { status: "success", message: "Agent created successfully" };
   } catch (error) {
     console.error(error);
     return { status: "error", message: "Failed to create agent" };
   }
-}
+};
 
 export const GetAllAgents = async () => {
   try {
@@ -175,9 +190,22 @@ export const GetAllAgents = async () => {
     console.error(error);
     return { status: "error", message: "Failed to fetch agents" };
   }
+};
+
+export const GetAllUserAgents = async (userId: string) => { 
+  try {
+    await dbConnect();
+
+    const agents = await Agent.find({ owner: userId as any }).lean();
+
+    return { status: "success", message: agents };
+  } catch (error) {
+    console.error(error);
+    return { status: "error", message: "Failed to fetch user agents" };
+  }
 }
 
-export const GetAllAgentHistories = async () => { 
+export const GetAllAgentHistories = async () => {
   try {
     await dbConnect();
 
@@ -188,9 +216,44 @@ export const GetAllAgentHistories = async () => {
     console.error(error);
     return { status: "error", message: "Failed to fetch agent histories" };
   }
+};
+
+export const GetAllUserAgentHistories = async (userId: string) => { 
+  try {
+    await dbConnect();
+
+    const agentHistories = await AgentHistory.find({ owner: userId as any }).populate("messages");
+
+    return { status: "success", message: agentHistories };
+  } catch (error) {
+    console.error(error);
+    return { status: "error", message: "Failed to fetch user agent histories" };
+  }
 }
 
-export const CreateChatAgentSession = async (payload: any) => { 
+export const GetSingleAgentHistory = async (id: string) => {
+  try {
+    await dbConnect();
+
+    const agentHistory = await AgentHistory.findById(id)
+      .populate({
+        path: "messages",
+        populate: {
+          path: "owner",
+          model: "User",
+          select: "username metaAddress image email", // optional
+        },
+      })
+      .lean();
+
+    return { status: "success", message: agentHistory };
+  } catch (error) {
+    console.error(error);
+    return { status: "error", message: "Failed to fetch agent history" };
+  }
+};
+
+export const CreateChatAgentSession = async (payload: any) => {
   const { agent, user } = payload;
   try {
     await dbConnect();
@@ -198,13 +261,47 @@ export const CreateChatAgentSession = async (payload: any) => {
     const chatSession = new AgentHistory({
       owner: user,
       ParentAgent: agent,
-    })
+    });
 
     await chatSession.save();
 
-    return { status: "success", message: chatSession._id.toString()};
+    return { status: "success", message: chatSession._id.toString() };
   } catch (error) {
     console.error(error);
     return { status: "error", message: "Failed to create chat session" };
   }
-}
+};
+
+export const CreateChatMessage = async (payload: any) => {
+  const { chatId, userChat, userId } = payload;
+  try {
+    await dbConnect();
+
+    const newMessage = new AgentMessage({
+      owner: userId,
+      message: userChat,
+      botMessage: "Hi am pratyush! Functionality coming soon...",
+    });
+
+    await newMessage.save();
+
+    const updatedAgentHistory = await AgentHistory.findByIdAndUpdate(
+      chatId,
+      {
+        $push: { messages: newMessage._id },
+      },
+      { new: true }
+    );
+
+    await updatedAgentHistory?.save();
+
+    revalidatePath(`/chat/${chatId}`);
+    return {
+      status: "success",
+      message: `Functionality coming soon! ${chatId} and ${userChat} by ${userId}`,
+    };
+  } catch (error) {
+    console.error(error);
+    return { status: "error", message: "Failed to create chat message" };
+  }
+};

@@ -2,15 +2,19 @@
 import Link from "next/link";
 import { useModal } from "../hooks/use-modal-store";
 import { logout } from "../lib/actions";
+import { useEffect } from "react";
 
 interface MainHeaderProps {
   userSession: any;
+  sessionData: any;
 }
 
-const MainHeader = ({ userSession }: MainHeaderProps) => {
+const MainHeader = ({ userSession, sessionData }: MainHeaderProps) => {
   const userData = JSON.parse(userSession);
+  const userInfo = JSON.parse(sessionData);
   const isLoggedIn = userData.isLoggedIn;
   const { onOpen } = useModal();
+
   const handleAuthenticate = () => {
     onOpen("AuthUser");
   };
@@ -19,6 +23,17 @@ const MainHeader = ({ userSession }: MainHeaderProps) => {
     await logout();
     window.location.reload();
   };
+
+  useEffect(() => {
+    if (userInfo?.username === undefined && isLoggedIn) {
+      console.log("there is no username");
+      onOpen("CreateUsername", userInfo?.userId);
+    }
+  }, [userInfo]);
+
+
+  // console.log(userInfo)
+  // console.log(isLoggedIn)
 
   return (
     <header className="flex items-center justify-between p-4">

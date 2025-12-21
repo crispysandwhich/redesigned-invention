@@ -2,9 +2,10 @@
 
 import { useModal } from "@/app/hooks/use-modal-store";
 import { CreateAgentAction } from "@/app/lib/actions";
+import { FileToBase64 } from "@/app/lib/utils";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
- 
+
 const CreateAgentModal = () => {
   const { isOpen, onClose, type, signature } = useModal();
   const isModalOpen = isOpen && type === "CreateAgent";
@@ -13,16 +14,23 @@ const CreateAgentModal = () => {
 
   const HandleAgentCreation = async (e: any) => {
     e.preventDefault();
-  
+
     const form = e.target as HTMLFormElement;
-  
+
     try {
       const agentName = e.target.agentName.value;
       const agentInstructions = e.target.agentInstructions.value;
       const profileImage = e.target.agentProfile.files[0];
-  
-      await CreateAgentAction({ agentName, agentInstructions, user: signature, profileImage });
-  
+
+      const baImage = await FileToBase64(profileImage);
+
+      await CreateAgentAction({
+        agentName,
+        agentInstructions,
+        user: signature,
+        profileImage: baImage,
+      });
+
       toast.success("Agent created successfully!");
       form.reset(); // ✅ works now
       onClose();
@@ -31,7 +39,6 @@ const CreateAgentModal = () => {
       toast.error("Failed to create agent. Please try again.");
     }
   };
-  
 
   return (
     <div

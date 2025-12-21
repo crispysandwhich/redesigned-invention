@@ -2,15 +2,17 @@
 import QuickImageBit from "../components/QuickImageBit";
 import QuickChatBit from "../components/QuickChatBit";
 import DashboardToolbar from "../components/DashboardToolbar";
-import { GetAllAgentHistories, GetAllAgents, getSession } from "../lib/actions";
+import { GetAllAgentHistories, GetAllAgents, GetAllUserAgentHistories, GetAllUserAgents, getSession } from "../lib/actions";
 import { verifyToken } from "../lib/jwt";
 
 const Page = async () => {
   const currentSession = await getSession();
   const userCurrent = verifyToken(currentSession.token || "");
 
-  const agents = await GetAllAgents()
-  const agentHistory = await GetAllAgentHistories()
+  // const agents = await GetAllAgents()
+  // const agentHistory = await GetAllAgentHistories()
+  const userAgents = await GetAllUserAgents(userCurrent?.userId || "")
+  const userAgentHistory = await GetAllUserAgentHistories(userCurrent?.userId || "")
 
   const RecentImageGen = [
     {
@@ -69,32 +71,13 @@ const Page = async () => {
       timestamp: "2024-06-13T10:05:00Z",
     },
   ];
-
-  const recentchats = [
-    {
-      id: 1,
-      title: "Project Brainstorm",
-      lastMessage: "Let's finalize the project scope by Friday.",
-      timestamp: "2024-06-15T10:30:00Z",
-    },
-    {
-      id: 2,
-      title: "Weekly Sync",
-      lastMessage: "Don't forget to send your updates before the meeting.",
-      timestamp: "2024-06-14T14:00:00Z",
-    },
-    {
-      id: 3,
-      title: "Client Feedback",
-      lastMessage: "The client loved the new design mockups!",
-      timestamp: "2024-06-13T09:15:00Z",
-    },
-  ];
   
   // console.log(currentSession)
   // console.log(userCurrent)
   // console.log(agents.message)
-  console.log(agentHistory.message)
+  // console.log(agentHistory.message)
+  // console.log(userAgents.message)
+  // console.log(userAgentHistory.message)
 
   return (
     <section className="min-h-screen px-6 py-12 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-slate-100 relative">
@@ -113,8 +96,8 @@ const Page = async () => {
 
       {/* Quick Bits + Agents */}
       <QuickChatBit
-        recentchats={JSON.stringify(agentHistory.message)}
-        availableAgents={JSON.stringify(agents.message)}
+        recentchats={JSON.stringify(userAgentHistory.message)}
+        availableAgents={JSON.stringify(userAgents.message)}
         user={userCurrent?.userId}
       />
 

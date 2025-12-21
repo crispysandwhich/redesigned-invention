@@ -1,7 +1,7 @@
 
 import { create } from "zustand";
 
-export type ModalType = "AuthUser" | "CreateAgent"
+export type ModalType = "AuthUser" | "CreateAgent" | "CreateUsername"
 
 interface ModalData {
   channel?: any;

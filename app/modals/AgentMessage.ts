@@ -2,6 +2,7 @@ import mongoose  from "mongoose";
 
 export interface AgentMessage {
   message: string;
+  botMessage?: string;
   owner: mongoose.Schema.Types.ObjectId
 }
 
@@ -16,6 +17,9 @@ const AgentMessageSchema = new mongoose.Schema<AgentMessage>(
     message: {
       type: String,
     },    
+    botMessage: {
+      type: String,
+    },
   },
   { timestamps: true }
 );

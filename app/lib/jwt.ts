@@ -22,13 +22,14 @@ export const verifyToken = (token: string) => {
   try {
     return jwt.verify(token, JWT_SECRET) as JWTPayload;
   } catch (error) {
+    console.log(error, "in the JWT")
     return null;
   }
 };
 
 
 
-export async function verifyTokenEdge(token: string) {
+export async function verifyTokenEdge(token: any) {
   try {
     const { payload } = await jwtVerify(token, secret);
     return payload;

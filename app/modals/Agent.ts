@@ -4,6 +4,7 @@ export interface IAgent {
   Agentname: string;
   instructions: string;
   profileImage: any;
+  profileImageUrl: string;
   owner: mongoose.Schema.Types.ObjectId
 }
 
@@ -24,6 +25,9 @@ const AgentSchema = new mongoose.Schema<IAgent>(
       ref: "User",
     },
     profileImage: {
+      type: String
+    },
+    profileImageUrl: {
       type: String
     }
   },

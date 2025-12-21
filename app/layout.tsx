@@ -5,6 +5,7 @@ import { ModalProvider } from "./providers/model-provider";
 import { ToastContainer } from "react-toastify";
 import MainHeader from "./components/MainHeader";
 import { getSession } from "./lib/actions";
+import { verifyTokenEdge } from "./lib/jwt";
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
@@ -23,13 +24,16 @@ export default async function RootLayout({
 }>) {
 
   const session = await getSession();
+  const sessionData = await verifyTokenEdge(session.token);
 
   return (
     <html lang="en">
       <body
         className={` ${geistMono.variable} antialiased`}
       >
-        <MainHeader userSession={JSON.stringify(session)} />
+        <MainHeader 
+          userSession={JSON.stringify(session)} 
+          sessionData={JSON.stringify(sessionData)}/>
         {children}
         <ToastContainer />
         <ModalProvider />
