@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { useModal } from "../hooks/use-modal-store";
 import { logout } from "../lib/actions";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 interface MainHeaderProps {
   userSession: any;
@@ -10,6 +10,7 @@ interface MainHeaderProps {
 }
 
 const MainHeader = ({ userSession, sessionData }: MainHeaderProps) => {
+  const [toggler, setToggler] = useState(false);
   const userData = JSON.parse(userSession);
   const userInfo = JSON.parse(sessionData);
   const isLoggedIn = userData.isLoggedIn;
@@ -26,13 +27,12 @@ const MainHeader = ({ userSession, sessionData }: MainHeaderProps) => {
 
   useEffect(() => {
     if (userInfo?.username === undefined && isLoggedIn) {
-      console.log("there is no username");
       onOpen("CreateUsername", userInfo?.userId);
     }
   }, [userInfo]);
 
 
-  // console.log(userInfo)
+  // console.log(userInfo.username)
   // console.log(isLoggedIn)
 
   return (
@@ -41,12 +41,18 @@ const MainHeader = ({ userSession, sessionData }: MainHeaderProps) => {
         <Link href="/">PixelMancer</Link>
       </h1>
 
-      <nav className="flex items-center gap-4">
+      <nav className="flex items-center gap-4 relative">
         <Link href="/defi">defi</Link>
         {isLoggedIn ? (
           <>
             <Link href="/dashboard">Dashboard</Link>
-            <button onClick={logoutHandler}>Logout</button>
+            <button onClick={() => setToggler((prev)=> !prev)}>{userInfo.username || "Ano"} ⬇️</button>
+            {toggler && (
+              <div className="absolute top-10 right-0 bg-[#111] border p-4 flex flex-col gap-2 z-100">
+                <Link href={`/profile`}>Profile</Link>
+                <button onClick={logoutHandler}>Logout</button>
+              </div>
+            )}
           </>
         ) : (
           <button onClick={handleAuthenticate}>authenticate</button>

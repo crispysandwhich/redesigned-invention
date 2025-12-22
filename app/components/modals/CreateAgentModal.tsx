@@ -3,115 +3,190 @@
 import { useModal } from "@/app/hooks/use-modal-store";
 import { CreateAgentAction } from "@/app/lib/actions";
 import { FileToBase64 } from "@/app/lib/utils";
-import { useRouter } from "next/navigation";
+import Image from "next/image";
+import { useState } from "react";
 import { toast } from "react-toastify";
 
 const CreateAgentModal = () => {
   const { isOpen, onClose, type, signature } = useModal();
   const isModalOpen = isOpen && type === "CreateAgent";
 
-  const router = useRouter();
+  const [preview, setPreview] = useState<string | null>(null);
 
   const HandleAgentCreation = async (e: any) => {
     e.preventDefault();
-
     const form = e.target as HTMLFormElement;
 
     try {
-      const agentName = e.target.agentName.value;
-      const agentInstructions = e.target.agentInstructions.value;
-      const profileImage = e.target.agentProfile.files[0];
+      const agentName = form.agentName.value;
+      const agentInstructions = form.agentInstructions.value;
+      const profileImage = form.agentProfile.files[0];
 
-      const baImage = await FileToBase64(profileImage);
+      const base64Image = profileImage
+        ? await FileToBase64(profileImage)
+        : null;
 
       await CreateAgentAction({
         agentName,
         agentInstructions,
         user: signature,
-        profileImage: baImage,
+        profileImage: base64Image,
       });
 
-      toast.success("Agent created successfully!");
-      form.reset(); // ✅ works now
+      toast.success("Agent created");
+      form.reset();
+      setPreview(null);
       onClose();
     } catch (error) {
-      console.log(error);
-      toast.error("Failed to create agent. Please try again.");
+      console.error(error);
+      toast.error("Failed to create agent");
     }
+  };
+
+  const handleImagePreview = (file: File) => {
+    const reader = new FileReader();
+    reader.onloadend = () => setPreview(reader.result as string);
+    reader.readAsDataURL(file);
   };
 
   return (
     <div
-      className={`fixed inset-0 z-50 flex items-center justify-center ${
-        isModalOpen ? "block" : "hidden"
-      }`}
+      className={`fixed inset-0 z-50 ${
+        isModalOpen ? "flex" : "hidden"
+      } items-center justify-center`}
     >
       {/* Overlay */}
       <div
-        className="fixed inset-0 bg-black/60 backdrop-blur-sm"
+        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
         onClick={onClose}
-      ></div>
+      />
 
-      <dialog
-        open={isModalOpen}
+      {/* Modal */}
+      <div
         className="
-          relative text-white w-full max-w-lg p-8 rounded-2xl shadow-2xl 
-          bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700
+          relative w-full max-w-md rounded-xl
+          bg-zinc-900 border border-zinc-800
+          shadow-xl p-6 text-zinc-100
         "
       >
-        <h2 className="text-3xl text-center font-semibold mb-6">
-          Create Agent
-        </h2>
+        {/* Header */}
+        <div className="mb-6">
+          <h2 className="text-xl font-semibold">Create Agent</h2>
+          <p className="text-sm text-zinc-400 mt-1">
+            Configure a new AI agent profile
+          </p>
+        </div>
 
-        <form className="space-y-5" onSubmit={HandleAgentCreation}>
+        <form onSubmit={HandleAgentCreation} className="space-y-4">
+          {/* Image Preview */}
+          <div className="flex items-center gap-4">
+            <div
+              className="
+                w-16 h-16 rounded-full
+                bg-zinc-800 border border-zinc-700
+                flex items-center justify-center
+                overflow-hidden
+                relative
+              "
+            >
+              {preview ? (
+                <Image
+                  src={preview}
+                  alt="Preview"
+                  fill
+                />
+              ) : (
+                <span className="text-xs text-zinc-500">No Image</span>
+              )}
+            </div>
+
+            <label
+              className="
+                text-sm text-zinc-400 cursor-pointer
+                hover:text-zinc-200 transition
+              "
+            >
+              Upload profile image
+              <input
+                type="file"
+                name="agentProfile"
+                className="hidden"
+                accept="image/*"
+                onChange={(e) =>
+                  e.target.files &&
+                  handleImagePreview(e.target.files[0])
+                }
+              />
+            </label>
+          </div>
+
+          {/* Agent Name */}
           <div>
-            <label className="text-sm text-gray-300">Agent Name: </label>
+            <label className="text-sm text-zinc-400">Agent Name</label>
             <input
-              type="text"
-              className="w-full p-3 mt-1 rounded-md bg-gray-800 border border-gray-700 focus:border-blue-500 outline-none"
-              placeholder="phlieop"
-              id="agentName"
               name="agentName"
+              placeholder="Agent Alpha"
+              className="
+                w-full mt-1 px-3 py-2 rounded-md
+                bg-zinc-800 border border-zinc-700
+                focus:border-zinc-500 focus:ring-1 focus:ring-zinc-500
+                outline-none transition
+              "
             />
           </div>
 
+          {/* Instructions */}
           <div>
-            <label className="text-sm text-gray-300">Agent Instructions:</label>
-            <input
-              type="text"
-              className="w-full p-3 mt-1 rounded-md bg-gray-800 border border-gray-700 focus:border-blue-500 outline-none"
-              placeholder="Your purpose is...."
-              id="agentInstructions"
+            <label className="text-sm text-zinc-400">Instructions</label>
+            <textarea
               name="agentInstructions"
+              rows={3}
+              placeholder="Describe the agent’s role..."
+              className="
+                w-full mt-1 px-3 py-2 rounded-md resize-none
+                bg-zinc-800 border border-zinc-700
+                focus:border-zinc-500 focus:ring-1 focus:ring-zinc-500
+                outline-none transition
+              "
             />
           </div>
 
-          <label htmlFor="agentProfile">
-            <span className="text-sm text-gray-300">Agent Profile Pic:</span>
-            <input
-              type="file"
-              id="agentProfile"
-              name="agentProfile"
-              className="w-full mt-1"
-            />
-          </label>
+          {/* Actions */}
+          <div className="flex justify-end gap-2 pt-4">
+            <button
+              type="button"
+              onClick={onClose}
+              className="
+                px-4 py-2 rounded-md
+                bg-zinc-800 hover:bg-zinc-700
+                text-zinc-300 text-sm transition
+              "
+            >
+              Cancel
+            </button>
 
-          <button
-            type="submit"
-            className="w-full bg-blue-600 hover:bg-blue-700 transition p-3 rounded-lg font-semibold shadow-lg"
-          >
-            enter
-          </button>
+            <button
+              type="submit"
+              className="
+                px-4 py-2 rounded-md
+                bg-zinc-200 text-zinc-900
+                hover:bg-white transition
+                text-sm font-medium
+              "
+            >
+              Create
+            </button>
+          </div>
         </form>
 
-        {/* Close Button */}
+        {/* Close icon */}
         <button
           onClick={onClose}
-          className="absolute top-3 right-3 text-gray-400 hover:text-white text-xl"
+          className="absolute top-3 right-3 text-zinc-500 hover:text-zinc-200"
         >
           ×
         </button>
-      </dialog>
+      </div>
     </div>
   );
 };

@@ -2,17 +2,15 @@
 import QuickImageBit from "../components/QuickImageBit";
 import QuickChatBit from "../components/QuickChatBit";
 import DashboardToolbar from "../components/DashboardToolbar";
-import { GetAllAgentHistories, GetAllAgents, GetAllUserAgentHistories, GetAllUserAgents, getSession } from "../lib/actions";
+import { GetAllUserAgentHistories, GetAllUserAgents, getSession } from "../lib/actions";
 import { verifyToken } from "../lib/jwt";
 
 const Page = async () => {
   const currentSession = await getSession();
   const userCurrent = verifyToken(currentSession.token || "");
 
-  // const agents = await GetAllAgents()
-  // const agentHistory = await GetAllAgentHistories()
-  const userAgents = await GetAllUserAgents(userCurrent?.userId || "")
-  const userAgentHistory = await GetAllUserAgentHistories(userCurrent?.userId || "")
+  const userAgents = (await GetAllUserAgents(userCurrent?.userId || "")) || []
+  const userAgentHistory = (await GetAllUserAgentHistories(userCurrent?.userId || "")) || []
 
   const RecentImageGen = [
     {
@@ -71,13 +69,7 @@ const Page = async () => {
       timestamp: "2024-06-13T10:05:00Z",
     },
   ];
-  
-  // console.log(currentSession)
-  // console.log(userCurrent)
-  // console.log(agents.message)
-  // console.log(agentHistory.message)
-  // console.log(userAgents.message)
-  // console.log(userAgentHistory.message)
+
 
   return (
     <section className="min-h-screen px-6 py-12 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-slate-100 relative">

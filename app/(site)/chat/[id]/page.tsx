@@ -15,7 +15,7 @@ const page = async ({ params }: PageProps) => {
   const messages = CurrentChatSession.message?.messages || []
   
   
-  // console.log(CurrentChatSession.message)
+  // console.log(CurrentChatSession.message.messages)
   // console.log(CurrentChatSession.message.messages[0].owner)
   // console.log(messages)
   // console.log(session)
@@ -28,7 +28,11 @@ const page = async ({ params }: PageProps) => {
             <p className='text-sm '>{CurrentChatSession.message?.title}</p>
         </header>
 
-        <ChatClient userMessages={JSON.stringify(messages)} chatId={id} userId={verifyedUser?.userId.toString()} />
+        <ChatClient 
+          userMessages={JSON.stringify(CurrentChatSession.message)} 
+          chatId={id} 
+          userId={verifyedUser?.userId.toString()} 
+        />
 
     </section>
   )

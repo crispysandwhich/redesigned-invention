@@ -171,7 +171,7 @@ export const CreateAgentAction = async (payload: any) => {
     });
 
     await newAgent.save();
-
+    revalidatePath(`/dashboard`);
     return { status: "success", message: "Agent created successfully" };
   } catch (error) {
     console.error(error);
@@ -236,14 +236,16 @@ export const GetSingleAgentHistory = async (id: string) => {
     await dbConnect();
 
     const agentHistory = await AgentHistory.findById(id)
-      .populate({
-        path: "messages",
-        populate: {
-          path: "owner",
-          model: "User",
-          select: "username metaAddress image email", // optional
-        },
-      })
+    .populate({
+      path: "owner",
+      select: "username image", 
+    })
+    .populate({
+      path: "ParentAgent", 
+    })
+    .populate({
+      path: "messages", 
+    })
       .lean();
 
     return { status: "success", message: agentHistory };

@@ -14,14 +14,14 @@ const DashboardToolbar = ({user}:DashboardToolbarProps) => {
     <div
       className="
         fixed
-        top-20
+        top-30
         right-6
         w-[180px]
-        h-[300px]
+        h-[250px]
         z-50
         rounded-2xl
         p-4
-        bg-gradient-to-br from-purple-900 via-blue-900 to-black
+        bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 
         shadow-2xl
         border border-white/10
         "
