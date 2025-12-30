@@ -10,6 +10,7 @@ export interface IUser {
   metaAddress: string;
   sig: string;
   description: string;
+  tokens: number;
 }
 
 // TODO: Make it better......
@@ -32,6 +33,10 @@ const UserSchema = new mongoose.Schema<IUser>(
     },
     image: {
       type: String,
+    },
+    tokens: {
+      type: Number,
+      default: 0,
     },
     metaAddress: {
       type: String,

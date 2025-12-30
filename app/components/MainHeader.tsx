@@ -32,9 +32,6 @@ const MainHeader = ({ userSession, sessionData }: MainHeaderProps) => {
   }, [userInfo]);
 
 
-  // console.log(userInfo.username)
-  // console.log(isLoggedIn)
-
   return (
     <header className="flex items-center justify-between p-4">
       <h1 className="text-2xl font-bold">

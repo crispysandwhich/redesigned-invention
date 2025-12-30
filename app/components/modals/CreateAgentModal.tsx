@@ -143,7 +143,7 @@ const CreateAgentModal = () => {
               rows={3}
               placeholder="Describe the agent’s role..."
               className="
-                w-full mt-1 px-3 py-2 rounded-md resize-none
+                w-full h-[300px] mt-1 px-3 py-2 rounded-md resize-none
                 bg-zinc-800 border border-zinc-700
                 focus:border-zinc-500 focus:ring-1 focus:ring-zinc-500
                 outline-none transition

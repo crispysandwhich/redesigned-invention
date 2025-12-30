@@ -2,8 +2,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { CreateChatAgentSession } from "../lib/actions";
 import { useRouter } from "next/navigation";
+import { CreateChatAgentSession } from "../lib/BotAgent";
 
 interface QuickChatBitProps {
   availableAgents: any;
@@ -44,8 +44,6 @@ const QuickChatBit = ({
       router.push(`/chat/${res.message}`);
     }
   };
-
-  console.log(sessionHistory.length);
 
   return (
     <div

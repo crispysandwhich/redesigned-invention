@@ -2,8 +2,9 @@
 import QuickImageBit from "../components/QuickImageBit";
 import QuickChatBit from "../components/QuickChatBit";
 import DashboardToolbar from "../components/DashboardToolbar";
-import { GetAllUserAgentHistories, GetAllUserAgents, getSession } from "../lib/actions";
+import { getSession } from "../lib/actions";
 import { verifyToken } from "../lib/jwt";
+import { GetAllUserAgentHistories, GetAllUserAgents } from "../lib/BotAgent";
 
 const Page = async () => {
   const currentSession = await getSession();

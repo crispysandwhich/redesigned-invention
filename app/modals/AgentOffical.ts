@@ -1,6 +1,6 @@
 import mongoose  from "mongoose";
 
-export interface IAgent {
+export interface IAgentOffical {
   Agentname: string;
   instructions: string;
   profileImage: any;
@@ -10,7 +10,7 @@ export interface IAgent {
 
 // TODO: Make it better......
 
-const AgentSchema = new mongoose.Schema<IAgent>(
+const AgentOfficalSchema = new mongoose.Schema<IAgentOffical>(
   {
     Agentname: {
       type: String,
@@ -34,14 +34,14 @@ const AgentSchema = new mongoose.Schema<IAgent>(
   { timestamps: true }
 );
 
-let AgentModel: mongoose.Model<IAgent>;
+let AgentOfficalModel: mongoose.Model<IAgentOffical>;
 
 try {
   // Try to retrieve an existing model
-  AgentModel = mongoose.model<IAgent>("Agent");
+  AgentOfficalModel = mongoose.model<IAgentOffical>("AgentOffical");
 } catch (e) {
   // If the model doesn't exist, define it
-  AgentModel = mongoose.model<IAgent>("Agent", AgentSchema);
+  AgentOfficalModel = mongoose.model<IAgentOffical>("AgentOffical", AgentOfficalSchema);
 }
 
-export const Agent = AgentModel;
+export const AgentOffical = AgentOfficalModel;

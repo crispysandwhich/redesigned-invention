@@ -1,16 +1,31 @@
 "use client";
 
 import Image from "next/image";
-import { CreateChatMessage } from "../lib/actions";
+import { CreateChatMessage } from "../lib/BotAgent";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import { useState } from "react";
 
 interface ChatClientProps {
   userMessages: any;
   chatId?: string;
   userId?: string;
+  chatTitle: string;
+  currentSessionAgent: any;
 }
 
-const ChatClient = ({ userMessages, chatId, userId }: ChatClientProps) => {
+const ChatClient = ({
+  userMessages,
+  chatId,
+  userId,
+  chatTitle,
+  currentSessionAgent
+}: ChatClientProps) => {
+  const [copied, setCopied] = useState(false);
   const sessionMessages = JSON.parse(userMessages);
+  const currentAgent = JSON.parse(currentSessionAgent);
+
+  console.log("session messages in chat client", sessionMessages);
 
   const HandleChatQuery = async (e: any) => {
     e.preventDefault();
@@ -30,32 +45,43 @@ const ChatClient = ({ userMessages, chatId, userId }: ChatClientProps) => {
     }
   };
 
+  const handleCopy = async (chat: any) => {
+    await navigator.clipboard.writeText(chat);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1200);
+  };
+
   return (
     <div className="flex flex-col h-[720px] max-w-3xl mx-auto bg-gray-900 text-gray-100 rounded-lg shadow-lg overflow-hidden">
       {/* Chat Header */}
-      <header className="px-6 py-4 border-b border-gray-700 bg-gray-800">
-        <h2 className="text-xl font-semibold">Chat with Agent</h2>
-        <p className="text-gray-400 text-sm">
-          Turn your queries into actionable messages.
-        </p>
+      <header className="px-6 py-4 border-b border-gray-700 bg-gray-800 flex items-center justify-between">
+        <div>
+          <h2 className="text-xl font-semibold">Chat with Agent</h2>
+          <p className="text-gray-400 text-sm">
+            Turn your queries into actionable messages.
+          </p>
+        </div>
+        <h3 className="text-gray-400 font-bold text-md text-shadow-lg">
+          {chatTitle}
+        </h3>
       </header>
 
       {/* Chat Messages */}
       <div className="flex-1 overflow-y-auto p-6 space-y-4">
-        {sessionMessages.messages.length === 0 ? (
+        {sessionMessages.length === 0 ? (
           <p className="text-gray-400 text-center">
             No messages yet. Start the conversation!
           </p>
         ) : (
           <ul className="space-y-4">
-            {sessionMessages.messages.map((msg, index) => (
+            {sessionMessages.map((msg, index) => (
               <li key={index} className="space-y-2">
                 {/* User Message */}
                 {msg.message && (
                   <div className="flex items-start gap-3">
                     <div className="relative w-10 h-10 flex-shrink-0">
                       <Image
-                        src={sessionMessages.owner.image || "/file.svg"}
+                        src={sessionMessages.owner?.image || "/file.svg"}
                         alt="user image"
                         fill
                         className="rounded-full object-cover"
@@ -69,18 +95,45 @@ const ChatClient = ({ userMessages, chatId, userId }: ChatClientProps) => {
 
                 {/* Bot Message */}
                 {msg.botMessage && (
-                  <div className="flex items-start gap-3 justify-end ml-12">
+                  <div className="flex flex-col items-start gap-3 justify-end bg-gray-800 p-4 text-shadow-lg rounded-lg">
                     <div className="relative w-10 h-10 flex-shrink-0">
                       <Image
-                        src={sessionMessages.ParentAgent.profileImage || "/bot.svg"}
+                        src={
+                          currentAgent.profileImage ||
+                          "/bot.svg"
+                        }
                         alt="bot image"
                         fill
                         className="rounded-full object-cover"
                       />
                     </div>
-                    <div className="bg-blue-600 text-gray-100 rounded-lg px-4 py-2 max-w-xl break-words">
+
+                    <ReactMarkdown
+                      remarkPlugins={[remarkGfm]}
+                      components={{
+                        code({ inline, className, children, ...props }) {
+                          return inline ? (
+                            <code className="bg-gray-700 px-1 py-0.5 rounded text-blue-300">
+                              {children}
+                            </code>
+                          ) : (
+                            <pre className="bg-black/60 rounded-lg p-4 overflow-x-auto">
+                              <button
+                                className="bg-gray-500 p-2 float-right"
+                                onClick={async () => await handleCopy(children)}
+                              >
+                                {copied ? "Copied!" : "Copy"}
+                              </button>
+                              <code className="text-sm text-gray-100">
+                                {children}
+                              </code>
+                            </pre>
+                          );
+                        },
+                      }}
+                    >
                       {msg.botMessage}
-                    </div>
+                    </ReactMarkdown>
                   </div>
                 )}
               </li>

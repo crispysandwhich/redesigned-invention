@@ -18,7 +18,7 @@ const AgentHistorySchema = new mongoose.Schema<IAgentHistory>(
     },
     ParentAgent: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Agent",
+      ref: "AgentOffical",
     },
     messages: [
       {

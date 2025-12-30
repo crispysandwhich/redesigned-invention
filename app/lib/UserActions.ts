@@ -43,3 +43,20 @@ export const CreateUsername = async (payload: any) => {
     return { status: "error", message: "Failed to create username" };
   }
 };
+
+export const GetSingleUser = async (userId: string) => { 
+  try {
+    await dbConnect();
+
+    const user = await User.findById(userId).select("-password").lean();
+
+    if (!user) {
+      return { status: "error", message: "User not found" };
+    }
+
+    return { status: "success", message: user };
+  } catch (error) {
+    console.error(error);
+    return { status: "error", message: "Failed to retrieve user" };
+  }
+}

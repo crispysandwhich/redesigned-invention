@@ -1,41 +1,53 @@
-"use server"
-import ChatClient from '@/app/components/ChatClient'
-import { getSession, GetSingleAgentHistory } from '@/app/lib/actions'
-import { verifyToken } from '@/app/lib/jwt'
+"use server";
+
+import ChatSessionWrapper from "@/app/components/ChatSessionWrapper";
+import { getSession } from "@/app/lib/actions";
+import { GetSingleAgentHistory } from "@/app/lib/BotAgent";
+import { verifyToken } from "@/app/lib/jwt";
+import Image from "next/image";
 
 type PageProps = {
-  params: Promise<{ id: string }>
-}
+  params: Promise<{ id: string }>;
+};
 
 const page = async ({ params }: PageProps) => {
-  const session = await getSession()
-  const verifyedUser = verifyToken(session?.token || "")
-  const { id } = await params
-  const CurrentChatSession = await GetSingleAgentHistory(id)
-  const messages = CurrentChatSession.message?.messages || []
-  
-  
-  // console.log(CurrentChatSession.message.messages)
-  // console.log(CurrentChatSession.message.messages[0].owner)
-  // console.log(messages)
-  // console.log(session)
-  // console.log(verifyedUser)
+  const session = await getSession();
+  const verifyedUser = verifyToken(session?.token || "");
+  const { id } = await params;
+  const CurrentChatSession = await GetSingleAgentHistory(id);
+  const messages = CurrentChatSession.message?.messages || [];
+  const sessionAgent = CurrentChatSession.message.ParentAgent
 
   return (
     <section>
-        <header className='mb-4'>
-            <h2 className='text-xl font-bold'>Chat with Agent</h2>
-            <p className='text-sm '>{CurrentChatSession.message?.title}</p>
-        </header>
+      <header className="mb-4 flex items-center justify-center">
+        <div className="relative w-100 h-100">
+          <Image
+            alt={CurrentChatSession.message.ParentAgent.Agentname}
+            src={`${CurrentChatSession.message.ParentAgent.profileImage}`}
+            fill
+          />
+        </div>
 
-        <ChatClient 
-          userMessages={JSON.stringify(CurrentChatSession.message)} 
-          chatId={id} 
-          userId={verifyedUser?.userId.toString()} 
-        />
+        <div className="w-[50%] ">
+          <h2 className="text-4xl font-bold">
+            {CurrentChatSession.message.ParentAgent.Agentname}
+          </h2>
+          <p className="text-md overflow-auto text-gray-500 h-[180px]">
+            {CurrentChatSession.message.ParentAgent.instructions}
+          </p>
+        </div>
+      </header>
 
+      <ChatSessionWrapper
+        userMessages={JSON.stringify(messages)}
+        chatId={id}
+        userId={verifyedUser?.userId.toString()}
+        chatTitle={CurrentChatSession.message.title}
+        currentSessionAgent={JSON.stringify(sessionAgent)}
+      />
     </section>
-  )
-}
+  );
+};
 
-export default page
+export default page;
