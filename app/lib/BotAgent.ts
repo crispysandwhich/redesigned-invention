@@ -3,12 +3,55 @@
 // Mongoose SideEffect Imports
 import "../modals/AgentMessage";
 
-import { AgentHistory } from "../modals/AgentHistory";
+import { AgentHistory, IAgentHistory } from "../modals/AgentHistory";
 import dbConnect from "./db";
 import { Agent, run } from "@openai/agents";
-import { AgentMessage } from "../modals/AgentMessage";
+import { AgentMessage, IAgentMessage } from "../modals/AgentMessage";
 import { revalidatePath } from "next/cache";
 import { AgentOffical } from "../modals/AgentOffical";
+import { Types } from "mongoose";
+
+// TYPES
+export type AgentHistoryPopulated = Omit<IAgentHistory, "messages"> & {
+  _id: Types.ObjectId;
+  messages: Types.ObjectId[] | IAgentMessage[];
+  ParentAgent: any; //TODO FIX this
+};
+
+type GetAgentHistoryResult =
+  | { status: "success"; message: AgentHistoryPopulated }
+  | { status: "error"; message: string };
+
+// Funnctions
+export const GetSingleAgentHistory = async (
+  id: string
+): Promise<GetAgentHistoryResult> => {
+  try {
+    await dbConnect();
+
+    const agentHistory = await AgentHistory.findById(id)
+      .populate({
+        path: "owner",
+        select: "username image",
+      })
+      .populate({
+        path: "ParentAgent",
+      })
+      .populate({
+        path: "messages",
+      })
+      .lean<AgentHistoryPopulated>();
+
+    if (!agentHistory) {
+      return { status: "error", message: "Agent history not found" };
+    }
+
+    return { status: "success", message: agentHistory };
+  } catch (error) {
+    console.error(error);
+    return { status: "error", message: "Failed to fetch agent history" };
+  }
+};
 
 export const GetAllAgents = async () => {
   try {
@@ -64,30 +107,6 @@ export const GetAllUserAgentHistories = async (userId: string) => {
   }
 };
 
-export const GetSingleAgentHistory = async (id: string) => {
-  try {
-    await dbConnect();
-
-    const agentHistory = await AgentHistory.findById(id)
-      .populate({
-        path: "owner",
-        select: "username image",
-      })
-      .populate({
-        path: "ParentAgent",
-      })
-      .populate({
-        path: "messages",
-      })
-      .lean();
-
-    return { status: "success", message: agentHistory };
-  } catch (error) {
-    console.error(error);
-    return { status: "error", message: "Failed to fetch agent history" };
-  }
-};
-
 export const CreateChatAgentSession = async (payload: any) => {
   const { agent, user } = payload;
   try {
@@ -107,23 +126,25 @@ export const CreateChatAgentSession = async (payload: any) => {
   }
 };
 
-export const UpdateChatTitle= async (payload: any) => {
-  const { chatId, title} = payload;
+export const UpdateChatTitle = async (payload: any) => {
+  const { chatId, title } = payload;
   try {
     await dbConnect();
 
-    const updated = await AgentHistory.findByIdAndUpdate(chatId, {title}, { new: true });
+    const updated = await AgentHistory.findByIdAndUpdate(
+      chatId,
+      { title },
+      { new: true }
+    );
 
     revalidatePath(`/chat/${chatId}`);
 
-    return { status: "success", message: updated  };
-
+    return { status: "success", message: updated };
   } catch (error) {
     console.error(error);
     return { status: "error", message: "Failed to change chat title" };
-    
   }
-}
+};
 
 export const CreateChatMessage = async (payload: any) => {
   const { chatId, userChat, userId } = payload;

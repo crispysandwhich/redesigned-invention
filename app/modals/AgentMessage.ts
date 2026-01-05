@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-export interface AgentMessage {
+export interface IAgentMessage {
   message: string;
   botMessage?: string;
   owner: mongoose.Schema.Types.ObjectId;
@@ -10,7 +10,7 @@ export interface AgentMessage {
 
 // TODO: Make it better......
 
-const AgentMessageSchema = new mongoose.Schema<AgentMessage>(
+const AgentMessageSchema = new mongoose.Schema<IAgentMessage>(
   {
     owner: {
       type: mongoose.Schema.Types.ObjectId,
@@ -34,14 +34,14 @@ const AgentMessageSchema = new mongoose.Schema<AgentMessage>(
   { timestamps: true }
 );
 
-let AgentMessageModel: mongoose.Model<AgentMessage>;
+let AgentMessageModel: mongoose.Model<IAgentMessage>;
 
 try {
   // Try to retrieve an existing model
-  AgentMessageModel = mongoose.model<AgentMessage>("AgentMessage");
+  AgentMessageModel = mongoose.model<IAgentMessage>("AgentMessage");
 } catch (e) {
   // If the model doesn't exist, define it
-  AgentMessageModel = mongoose.model<AgentMessage>(
+  AgentMessageModel = mongoose.model<IAgentMessage>(
     "AgentMessage",
     AgentMessageSchema
   );

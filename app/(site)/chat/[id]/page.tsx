@@ -2,7 +2,10 @@
 
 import ChatSessionWrapper from "@/app/components/ChatSessionWrapper";
 import { getSession } from "@/app/lib/actions";
-import { GetSingleAgentHistory } from "@/app/lib/BotAgent";
+import {
+  AgentHistoryPopulated,
+  GetSingleAgentHistory,
+} from "@/app/lib/BotAgent";
 import { verifyToken } from "@/app/lib/jwt";
 import Image from "next/image";
 
@@ -14,9 +17,16 @@ const page = async ({ params }: PageProps) => {
   const session = await getSession();
   const verifyedUser = verifyToken(session?.token || "");
   const { id } = await params;
+
   const CurrentChatSession = await GetSingleAgentHistory(id);
+  if (CurrentChatSession.status !== "success") {
+    return <div>Hell</div>;
+  }
   const messages = CurrentChatSession.message?.messages || [];
-  const sessionAgent = CurrentChatSession.message.ParentAgent
+
+  const sessionAgent = CurrentChatSession.message?.ParentAgent as any;
+
+  console.log("CurrentChatSession:", CurrentChatSession.message);
 
   return (
     <section>
