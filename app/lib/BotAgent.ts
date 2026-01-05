@@ -153,7 +153,7 @@ export const CreateChatMessage = async (payload: any) => {
 
     const currentAgent = await AgentHistory.findById(chatId).populate(
       "ParentAgent"
-    );
+    ).lean<AgentHistoryPopulated>();
 
     const agent = new Agent({
       name: currentAgent?.ParentAgent?.Agentname,

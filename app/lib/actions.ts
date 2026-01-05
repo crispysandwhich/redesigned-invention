@@ -13,7 +13,8 @@ import dbConnect from "./db";
 import fs from "fs/promises";
 import path from "path";
 import { AgentOffical } from "../modals/AgentOffical";
-import { Agent, imageGenerationTool } from "@openai/agents";
+import { ResponseOutputItem } from "openai/resources/responses/responses.js";
+
 
 const openai = new OpenAI();
 
@@ -194,7 +195,7 @@ export const CreateImageAction = async (payload: any) => {
     await agentsPath.save();
 
     let response;
-    if(baseImage !== null){
+    if (baseImage !== null) {
       response = await openai.responses.create({
         model: "gpt-5-nano",
         input: [
@@ -245,22 +246,29 @@ export const CreateImageAction = async (payload: any) => {
       });
     }
 
-
     // 🔍 Extract image safely
     const imageOutput = response.output.find(
-      (o: any) => o.type === "image_generation_call" && o.status === "completed"
+      (o: ResponseOutputItem) =>
+        o.type === "image_generation_call" && o.status === "completed"
     );
 
-    const imageBase64 = imageOutput?.result ?? null;
+    const imageBase64 =
+      imageOutput && "result" in imageOutput ? imageOutput.result : null;
 
-    const assistantMessages = response.output.filter(
-      (o: any) => o.type === "message"
-    );
+    const assistantMessages = response.output
+      .filter((o: ResponseOutputItem) => o.type === "message")
+      .map((msg: any) => {
+        if ("result" in msg) {
+          return msg.result;
+        }
+        return null;
+      })
+      .filter((msg: string | null): msg is string => msg !== null);
 
     const agentMessage = new AgentMessage({
       owner: userId,
       message: context,
-      botMessage: assistantMessages.map((msg: any) => msg.result).join("\n"),
+      botMessage: assistantMessages.join("\n"),
       images: imageBase64 ? [`data:image/png;base64,${imageBase64}`] : [],
       responseId: response.id,
     });

@@ -10,7 +10,7 @@ const page = async ({ params }: PageProps) => {
 
   const { id } = await params;
 
-  const agentHistory = await GetSingleAgentHistory(id);
+  const agentHistory = (await GetSingleAgentHistory(id)) as any;
 
   return (
     <section>
