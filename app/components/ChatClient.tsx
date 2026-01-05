@@ -111,7 +111,7 @@ const ChatClient = ({
                     <ReactMarkdown
                       remarkPlugins={[remarkGfm]}
                       components={{
-                        code({ inline, className, children, ...props }) {
+                        code({ inline, className, children, ...props }: { inline?: boolean; className?: string; children?: React.ReactNode }) {
                           return inline ? (
                             <code className="bg-gray-700 px-1 py-0.5 rounded text-blue-300">
                               {children}
