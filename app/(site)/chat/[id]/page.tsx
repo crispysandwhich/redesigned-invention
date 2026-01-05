@@ -20,13 +20,12 @@ const page = async ({ params }: PageProps) => {
 
   const CurrentChatSession = await GetSingleAgentHistory(id);
   if (CurrentChatSession.status !== "success") {
-    return <div>Hell</div>;
+    return <div>there is not chat availble</div>;
   }
   const messages = CurrentChatSession.message?.messages || [];
 
   const sessionAgent = CurrentChatSession.message?.ParentAgent as any;
 
-  console.log("CurrentChatSession:", CurrentChatSession.message);
 
   return (
     <section>

@@ -1,5 +1,7 @@
 "use client";
 
+
+
 import { useModal } from "@/app/hooks/use-modal-store";
 import { useRouter } from "next/navigation";
 import { ethers } from "ethers";
@@ -42,7 +44,7 @@ const AuthUserModal = () => {
 
   const handleMetamaskLogin = async () => {
     try {
-      if (!window.ethereum) {
+      if (typeof window.ethereum === "undefined") {
         toast.error("MetaMask not installed");
         return;
       }

@@ -1,27 +1,24 @@
-"use server"
+"use server";
 
-import { getSession } from "@/app/lib/actions"
-import { verifyToken } from "@/app/lib/jwt"
-import { GetSingleUser } from "@/app/lib/UserActions"
-import Image from "next/image"
+import { getSession } from "@/app/lib/actions";
+import { verifyToken } from "@/app/lib/jwt";
+import { GetSingleUser } from "@/app/lib/UserActions";
+import Image from "next/image";
 
 const page = async () => {
+  const userToken = await getSession();
+  const verifyUser = verifyToken(userToken.token as string);
+  const UserData = (await GetSingleUser(verifyUser!.userId)).message as any;
 
-  const userToken = await getSession()
-  const verifyUser = verifyToken(userToken.token as string)
-  const UserData = (await GetSingleUser(verifyUser!.userId)).message
-
-  console.log(UserData)
-
+  console.log(UserData);
 
   return (
-    <section className='w-full min-h-screen'>
-      <h1 className='text-3xl font-bold underline'>{UserData?.username || "Ano"} Profile Page</h1>
+    <section className="w-full min-h-screen">
+      <h1 className="text-3xl font-bold underline">
+        {UserData?.username || "Ano"} Profile Page
+      </h1>
       <div className="relative w-[300px] h-[300px]">
-        <Image
-          src={UserData.image || "/file.svg"}
-          alt="Profile image" 
-          fill />
+        <Image src={UserData.image || "/file.svg"} alt="Profile image" fill />
       </div>
       <p>{UserData.description || "No description available"}</p>
 
@@ -42,9 +39,8 @@ const page = async () => {
         <h2>tokens:</h2>
         <p>{UserData?.tokens || 0}</p>
       </div>
-
     </section>
-  )
-}
+  );
+};
 
-export default page
+export default page;

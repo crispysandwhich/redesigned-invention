@@ -25,11 +25,11 @@ const CreateImageModal = () => {
 
       const base64Image = baseImage ? await FileToBase64(baseImage) : null;
 
-      const res = await CreateImageAction({
+      const res = (await CreateImageAction({
         context: agentContext,
         baseImage: base64Image,
         userId: signature
-      });
+      })) as any;
 
       if(res.status === "success") {
         router.push(`/imageGen/${res.message?.urlID}`);
