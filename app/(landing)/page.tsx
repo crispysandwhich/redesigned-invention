@@ -4,95 +4,173 @@ import Link from "next/link";
 
 export default async function Home() {
   return (
-    <main className="px-6 sm:px-10 py-16 flex flex-col items-center gap-20">
-      {/* ---------------- HERO SECTION ---------------- */}
-      <div className="relative w-full max-w-5xl">
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-purple-700 via-purple-600 to-indigo-700 p-8 sm:p-14 shadow-xl flex flex-col gap-6">
-          {/* Glass overlay */}
-          <div className="absolute inset-0 bg-white/10 backdrop-blur-3xl pointer-events-none" />
+    <main className="relative overflow-hidden bg-gradient-to-b from-[#0b0218] via-[#120726] to-black text-white">
+      {/* ================= HERO ================= */}
+      <section className="relative px-6 sm:px-10 pt-28 pb-36 flex justify-center">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(147,51,234,0.25),_transparent_60%)]" />
 
-          {/* Text */}
-          <div className="relative z-10 max-w-xl">
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight">
-              Build your own AI agent to get anything done
-            </h2>
+        <div className="relative max-w-6xl w-full grid lg:grid-cols-2 gap-16 items-center">
+          {/* Left */}
+          <div>
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight">
+              Prysmor
+              <span className="block mt-2 bg-gradient-to-r from-purple-400 to-indigo-400 bg-clip-text text-transparent">
+                An AI Creative Studio
+              </span>
+            </h1>
 
-            <p className="mt-3 text-lg sm:text-xl text-purple-100/90 leading-relaxed">
-              Chat, generate images, automate tasks — your AI works exactly how
-              you want.
+            <p className="mt-6 text-lg sm:text-xl text-white/80 max-w-xl">
+              Design intelligent agents. Generate and edit images. Build creative
+              workflows — all in one focused studio built for creators.
             </p>
 
-            <Link
-              href="/defi"
-              className="mt-6 inline-block rounded-xl bg-white/20 backdrop-blur-lg hover:bg-white/30 px-6 py-3 text-white font-semibold shadow-lg transition-all"
-            >
-              Get started today
-            </Link>
+            <div className="mt-10 flex gap-4 flex-wrap">
+              <Link
+                href="/signup"
+                className="rounded-xl bg-gradient-to-r from-purple-500 to-indigo-500 px-7 py-4 font-semibold shadow-xl hover:scale-105 transition"
+              >
+                Start Creating
+              </Link>
+
+              <Link
+                href="/explore"
+                className="rounded-xl border border-white/20 px-7 py-4 text-white/80 hover:bg-white/10 transition"
+              >
+                Explore Features
+              </Link>
+            </div>
           </div>
 
-          {/* Robot image */}
-          <div className="absolute right-4 sm:right-10 bottom-0 sm:bottom-6 opacity-90">
+          {/* Right Visual */}
+          <div className="relative">
+            <div className="absolute -inset-6 bg-purple-600/20 blur-3xl rounded-full" />
             <Image
               src="/ai-robot.webp"
-              alt="AI Robot"
-              width={260}
-              height={260}
-              className="w-32 sm:w-48 md:w-60 object-contain drop-shadow-2xl"
+              alt="Prysmor Studio Preview"
+              width={520}
+              height={520}
+              className="relative rounded-2xl shadow-2xl border border-white/10"
             />
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* ---------------- FEATURES SECTION ---------------- */}
-      <section className="w-full max-w-6xl">
-        <h3 className="text-3xl sm:text-4xl font-bold text-center text-purple-900 mb-10">
-          Everything you need to build with AI
-        </h3>
-
-        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
-          {/* Feature 1 */}
-          <div className="relative backdrop-blur-xl rounded-2xl shadow-xl p-6 flex flex-col gap-4 transition hover:scale-[1.02] hover:shadow-2xl border border-white/30">
-            <div className="w-14 h-14 flex items-center justify-center rounded-xl bg-purple-600/80 shadow-md text-white text-2xl">
-              💬
+      {/* ================= TRUST STRIP ================= */}
+      <section className="px-6 sm:px-10 pb-24">
+        <div className="max-w-6xl mx-auto grid grid-cols-2 sm:grid-cols-4 gap-6 text-center">
+          {[
+            "Creator-first design",
+            "Private sessions",
+            "Persistent agents",
+            "Built for iteration",
+          ].map((item) => (
+            <div
+              key={item}
+              className="rounded-xl bg-white/5 backdrop-blur-lg py-5 text-sm sm:text-base font-semibold text-white/90 border border-white/10"
+            >
+              {item}
             </div>
-            <h4 className="text-xl font-semibold text-purple-900">
-              AI Chat Sessions
-            </h4>
-            <p className="">
-              Create and manage conversations with intelligent agents. Switch
-              between sessions, save messages, and build your own workflow with
-              AI in minutes.
-            </p>
-          </div>
+          ))}
+        </div>
+      </section>
 
-          {/* Feature 2 */}
-          <div className="relative backdrop-blur-xl rounded-2xl shadow-xl p-6 flex flex-col gap-4 transition hover:scale-[1.02] hover:shadow-2xl border border-white/30">
-            <div className="w-14 h-14 flex items-center justify-center rounded-xl bg-indigo-600/80 shadow-md text-white text-2xl">
-              🎨
-            </div>
-            <h4 className="text-xl font-semibold text-purple-900">
-              Image Generation & Editing
-            </h4>
-            <p className="">
-              Generate stunning AI images or upload your own for powerful
-              editing. Enhance, restyle, remove objects, and save or share your
-              creations instantly.
-            </p>
-          </div>
+      {/* ================= FEATURES ================= */}
+      <section className="px-6 sm:px-10 py-28 bg-gradient-to-b from-black to-[#0e061d]">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-3xl sm:text-4xl font-bold text-center">
+            A Studio Built for Creation
+          </h2>
 
-          {/* Feature 3 (Custom Idea) */}
-          <div className="relative backdrop-blur-xl rounded-2xl shadow-xl p-6 flex flex-col gap-4 transition hover:scale-[1.02] hover:shadow-2xl border border-white/30">
-            <div className="w-14 h-14 flex items-center justify-center rounded-xl bg-pink-600/80 shadow-md text-white text-2xl">
-              ⚙️
-            </div>
-            <h4 className="text-xl font-semibold text-purple-900">
-              Build Custom AI Agents
-            </h4>
-            <p className="">
-              Create your own specialized AI agent that performs tasks, analyzes
-              data, responds with custom rules, and adapts to how *you* work.
-            </p>
+          <p className="mt-4 text-center text-white/70 max-w-2xl mx-auto">
+            Prysmor gives you the tools to explore ideas, shape intelligence, and
+            turn concepts into output — without friction.
+          </p>
+
+          <div className="mt-20 grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
+            {[
+              {
+                icon: "💬",
+                title: "AI Chat Agents",
+                desc: "Create agents with personality, memory, and intent. Each session evolves as you work.",
+              },
+              {
+                icon: "🎨",
+                title: "Image Generation & Editing",
+                desc: "Generate visuals, restyle images, or refine details — all within your creative flow.",
+              },
+              {
+                icon: "⚙️",
+                title: "Custom Creative Agents",
+                desc: "Design agents specialized for writing, design, ideation, or experimentation.",
+              },
+            ].map((f) => (
+              <div
+                key={f.title}
+                className="relative rounded-2xl bg-white/5 backdrop-blur-xl p-6 border border-white/10 shadow-xl hover:scale-[1.03] transition"
+              >
+                <div className="text-3xl">{f.icon}</div>
+                <h3 className="mt-4 text-xl font-semibold">{f.title}</h3>
+                <p className="mt-2 text-white/70">{f.desc}</p>
+              </div>
+            ))}
           </div>
+        </div>
+      </section>
+
+      {/* ================= HOW IT WORKS ================= */}
+      <section className="px-6 sm:px-10 py-28">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-3xl sm:text-4xl font-bold text-center">
+            How Prysmor Works
+          </h2>
+
+          <div className="mt-20 grid gap-12 sm:grid-cols-3">
+            {[
+              {
+                step: "01",
+                title: "Create an Agent",
+                desc: "Define what your agent does — chat, visuals, or both.",
+              },
+              {
+                step: "02",
+                title: "Start a Session",
+                desc: "Explore ideas, generate output, and iterate in real time.",
+              },
+              {
+                step: "03",
+                title: "Build Over Time",
+                desc: "Your agents and sessions persist, improving with use.",
+              },
+            ].map((s) => (
+              <div key={s.step} className="text-center">
+                <div className="text-purple-400 font-bold text-lg">
+                  {s.step}
+                </div>
+                <h3 className="mt-3 text-xl font-semibold">{s.title}</h3>
+                <p className="mt-2 text-white/70">{s.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ================= FINAL CTA ================= */}
+      <section className="px-6 sm:px-10 pb-36">
+        <div className="max-w-5xl mx-auto rounded-3xl bg-gradient-to-br from-purple-600/30 to-indigo-600/30 backdrop-blur-2xl border border-white/10 p-14 text-center shadow-2xl">
+          <h2 className="text-3xl sm:text-4xl font-bold">
+            Create with Intelligence
+          </h2>
+
+          <p className="mt-4 text-white/80 text-lg">
+            Prysmor is your creative studio for intelligent ideas.
+          </p>
+
+          <Link
+            href="/signup"
+            className="mt-10 inline-block rounded-xl bg-white px-10 py-4 font-semibold text-black shadow-xl hover:scale-105 transition"
+          >
+            Join Prysmor
+          </Link>
         </div>
       </section>
     </main>

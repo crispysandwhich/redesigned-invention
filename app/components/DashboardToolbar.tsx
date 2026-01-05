@@ -34,9 +34,11 @@ const DashboardToolbar = ({user}:DashboardToolbarProps) => {
         >
           Create Agent
         </button>
-        <Link href="/" className="hover:text-purple-300 transition">
+        <button 
+          onClick={() => onOpen("CreateImage", user)}
+          className="hover:text-purple-300 transition">
           Create Image
-        </Link>
+        </button>
         <Link href="/" className="hover:text-purple-300 transition">
           Edit Image
         </Link>

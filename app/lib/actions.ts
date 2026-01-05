@@ -2,6 +2,7 @@
 
 import { cookies } from "next/headers";
 import { User } from "../modals/User";
+import OpenAI from "openai";
 
 import { AgentHistory } from "../modals/AgentHistory";
 import { AgentMessage } from "../modals/AgentMessage";
@@ -12,6 +13,9 @@ import dbConnect from "./db";
 import fs from "fs/promises";
 import path from "path";
 import { AgentOffical } from "../modals/AgentOffical";
+import { Agent, imageGenerationTool } from "@openai/agents";
+
+const openai = new OpenAI();
 
 export const getSession = async () => {
   const cookieStore = await cookies();
@@ -155,11 +159,7 @@ export const CreateAgentAction = async (payload: any) => {
     const extension = meta.match(/image\/(.*?);/)?.[1] || "png";
     const buffer = Buffer.from(base64Data, "base64");
     const filename = `${Date.now()}-${user}.${extension}`;
-    const filePath = path.join(
-      process.cwd(),
-      "public/agents",
-      filename
-    );
+    const filePath = path.join(process.cwd(), "public/agents", filename);
 
     await fs.writeFile(filePath, buffer);
 
@@ -168,7 +168,7 @@ export const CreateAgentAction = async (payload: any) => {
       instructions: agentInstructions,
       owner: user,
       profileImage,
-      profileImageUrl: `/agents/${filename}`
+      profileImageUrl: `/agents/${filename}`,
     });
 
     await newAgent.save();
@@ -180,4 +180,119 @@ export const CreateAgentAction = async (payload: any) => {
   }
 };
 
+export const CreateImageAction = async (payload: any) => {
+  const { context, baseImage, userId } = payload;
 
+  try {
+    await dbConnect();
+
+    const agentsPath = new AgentHistory({
+      owner: userId,
+      imageHistory: true,
+    });
+
+    await agentsPath.save();
+
+    let response;
+    if(baseImage !== null){
+      response = await openai.responses.create({
+        model: "gpt-5-nano",
+        input: [
+          {
+            role: "user",
+            content: [
+              {
+                type: "input_text",
+                text: context,
+              },
+              {
+                type: "input_image",
+                image_url: baseImage,
+                detail: "auto",
+              },
+            ],
+          },
+        ],
+        tools: [
+          {
+            type: "image_generation",
+            background: "transparent",
+            quality: "high",
+          },
+        ],
+      });
+    } else {
+      response = await openai.responses.create({
+        model: "gpt-5-nano",
+        input: [
+          {
+            role: "user",
+            content: [
+              {
+                type: "input_text",
+                text: context,
+              },
+            ],
+          },
+        ],
+        tools: [
+          {
+            type: "image_generation",
+            background: "transparent",
+            quality: "high",
+          },
+        ],
+      });
+    }
+
+
+    // 🔍 Extract image safely
+    const imageOutput = response.output.find(
+      (o: any) => o.type === "image_generation_call" && o.status === "completed"
+    );
+
+    const imageBase64 = imageOutput?.result ?? null;
+
+    const assistantMessages = response.output.filter(
+      (o: any) => o.type === "message"
+    );
+
+    const agentMessage = new AgentMessage({
+      owner: userId,
+      message: context,
+      botMessage: assistantMessages.map((msg: any) => msg.result).join("\n"),
+      images: imageBase64 ? [`data:image/png;base64,${imageBase64}`] : [],
+      responseId: response.id,
+    });
+
+    await agentMessage.save();
+
+    await AgentHistory.findByIdAndUpdate(agentsPath._id, {
+      $push: { messages: agentMessage._id },
+    });
+
+    return {
+      status: "success",
+      message: {
+        urlID: agentsPath._id.toString(),
+        image: imageBase64 ? `data:image/png;base64,${imageBase64}` : null,
+        metadata: {
+          responseId: response.id,
+          model: response.model,
+          usage: response.usage,
+          outputs: response.output.map((o: any) => ({
+            type: o.type,
+            status: o.status,
+          })),
+          assistantMessages,
+        },
+      },
+    };
+  } catch (error) {
+    console.error("CreateImageAction error:", error);
+    return {
+      status: "error",
+      message: "Failed to create image",
+    };
+  }
+};

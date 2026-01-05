@@ -1,8 +1,27 @@
-import React from 'react'
+"use server"
 
-const page = () => {
+import { GetSingleAgentHistory } from "@/app/lib/BotAgent";
+
+type PageProps = {
+  params: Promise<{ id: string }>;
+};
+
+const page = async ({ params }: PageProps) => {
+
+  const { id } = await params;
+
+  const agentHistory = await GetSingleAgentHistory(id);
+
   return (
-    <div>Final Image</div>
+    <section>
+      <div className="w-[300px] h-[300px] relative">
+      <img
+          src={agentHistory.message.messages[0].images[0]}
+          alt={agentHistory.message.messages[0].message}
+          className="w-[300px] h-[300px] object-contain rounded-xl"
+        />
+      </div>
+    </section>
   )
 }
 

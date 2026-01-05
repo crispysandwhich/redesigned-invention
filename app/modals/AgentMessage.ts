@@ -1,9 +1,11 @@
-import mongoose  from "mongoose";
+import mongoose from "mongoose";
 
 export interface AgentMessage {
   message: string;
   botMessage?: string;
-  owner: mongoose.Schema.Types.ObjectId
+  owner: mongoose.Schema.Types.ObjectId;
+  images?: string[];
+  responseId?: string;
 }
 
 // TODO: Make it better......
@@ -16,8 +18,16 @@ const AgentMessageSchema = new mongoose.Schema<AgentMessage>(
     },
     message: {
       type: String,
-    },    
+    },
     botMessage: {
+      type: String,
+    },
+    images: [
+      {
+        type: String,
+      },
+    ],
+    responseId: {
       type: String,
     },
   },
@@ -31,7 +41,10 @@ try {
   AgentMessageModel = mongoose.model<AgentMessage>("AgentMessage");
 } catch (e) {
   // If the model doesn't exist, define it
-  AgentMessageModel = mongoose.model<AgentMessage>("AgentMessage", AgentMessageSchema);
+  AgentMessageModel = mongoose.model<AgentMessage>(
+    "AgentMessage",
+    AgentMessageSchema
+  );
 }
 
 export const AgentMessage = AgentMessageModel;

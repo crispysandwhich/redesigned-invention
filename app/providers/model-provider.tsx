@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import AuthUserModel from "../components/modals/AuthUserModel";
 import CreateAgentModal from "../components/modals/CreateAgentModal";
 import CreateUsernameModel from "../components/modals/CreateUsernameModel";
+import CreateImageModal from "../components/modals/CreateImageModal";
 
 
 
@@ -23,6 +24,7 @@ export const  ModalProvider = () => {
     <AuthUserModel />
     <CreateAgentModal />
     <CreateUsernameModel />
+    <CreateImageModal />
     </>
   );
 };

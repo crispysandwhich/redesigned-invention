@@ -1,16 +1,12 @@
 import type { Metadata } from "next";
-import { Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ModalProvider } from "./providers/model-provider";
 import { ToastContainer } from "react-toastify";
 import MainHeader from "./components/MainHeader";
 import { getSession } from "./lib/actions";
 import { verifyTokenEdge } from "./lib/jwt";
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import { geistMono } from "./components/ui/Font";
+import MainFooter from "./components/MainFooter";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -22,19 +18,18 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-
   const session = await getSession();
   const sessionData = await verifyTokenEdge(session.token);
 
   return (
     <html lang="en">
-      <body
-        className={` ${geistMono.variable} antialiased`}
-      >
-        <MainHeader 
-          userSession={JSON.stringify(session)} 
-          sessionData={JSON.stringify(sessionData)}/>
+      <body className={` ${geistMono.variable} antialiased`}>
+        <MainHeader
+          userSession={JSON.stringify(session)}
+          sessionData={JSON.stringify(sessionData)}
+        />
         {children}
+        <MainFooter />
         <ToastContainer />
         <ModalProvider />
       </body>

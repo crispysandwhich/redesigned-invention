@@ -4,8 +4,9 @@ export interface IAgentHistory {
   AgentHistoryname: string;
   title: string;
   owner: mongoose.Schema.Types.ObjectId;
-  ParentAgent: mongoose.Schema.Types.ObjectId;
+  ParentAgent?: mongoose.Schema.Types.ObjectId;
   messages?: mongoose.Schema.Types.ObjectId[];
+  imageHistory?: boolean;
 }
 
 // TODO: Make it better......
@@ -29,6 +30,10 @@ const AgentHistorySchema = new mongoose.Schema<IAgentHistory>(
     title: {
       type: String,
       default: "New Chat",
+    },
+    imageHistory: {
+      type: Boolean,
+      default: false,
     },
   },
   { timestamps: true }

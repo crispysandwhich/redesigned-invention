@@ -74,7 +74,7 @@ const ChatClient = ({
           </p>
         ) : (
           <ul className="space-y-4">
-            {sessionMessages.map((msg, index) => (
+            {sessionMessages.map((msg:any, index:any) => (
               <li key={index} className="space-y-2">
                 {/* User Message */}
                 {msg.message && (
@@ -145,22 +145,39 @@ const ChatClient = ({
       {/* Input Box */}
       <form
         onSubmit={HandleChatQuery}
-        className="px-6 py-4 border-t border-gray-700 bg-gray-800 flex gap-3"
+        className="px-6 py-4 border-t border-gray-700 bg-gray-800 flex-col gap-3"
       >
-        <textarea
-          name="UserChat"
-          id="UserChat"
-          placeholder="Type your message..."
-          className="flex-1 resize-none rounded-lg bg-gray-700 px-4 py-2 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400"
-          rows={2}
-          required
-        />
-        <button
-          type="submit"
-          className="bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg px-4 py-2 transition-colors"
-        >
-          Send
-        </button>
+        <div className="flex items-center gap-4 text-sm">
+          <label htmlFor="webSearch">
+            <input
+              type="checkbox"
+              id="webSearch"
+              name="webSearch"
+              className="mr-2 leading-tight"
+            />
+            <span className="text-gray-200">Enable Web Search</span>
+          </label>
+          <label htmlFor="imageInput">
+            <input type="file" id="imageInput" name="imageInput" />
+            <span className="text-gray-200">Attach Image</span>
+          </label>
+        </div>
+        <div className="w-full flex">
+          <textarea
+            name="UserChat"
+            id="UserChat"
+            placeholder="Type your message..."
+            className="flex-1 resize-none rounded-lg bg-gray-700 px-4 py-2 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400"
+            rows={2}
+            required
+          />
+          <button
+            type="submit"
+            className="bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg px-4 py-2 transition-colors"
+          >
+            Send
+          </button>
+        </div>
       </form>
     </div>
   );
